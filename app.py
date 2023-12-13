@@ -1,11 +1,21 @@
 #Importação das bibliotecas
 import streamlit as st 
-from utils import DropFeatures, OneHotEncoding, OrdinalFeature, OverSample, MinMax
+from utils import DropFeatures, OneHotEncoding, OrdinalFeature, OverSample, MinMax, data_split
 import pandas as pd
 from sklearn.pipeline import Pipeline
-from sklearn.model_selection import train_test_split
 import joblib
 from joblib import load
+
+def pipeline_ml(df):
+    pipeline = Pipeline([
+        ('feature_dropper', DropFeatures()),
+        ('one_hot_encoder', OneHotEncoding()),
+        ('ordinal_encoder', OrdinalFeature()),
+        ('scaler', MinMax())
+    ])
+
+    df_pipeline = pipeline.fit_transform(df)
+    return df_pipeline
 
 # Dicionário para converter Sim e Não para binário
 dict_binario = {'Sim':1, 'Não':0}
@@ -90,3 +100,11 @@ new_client = [0, input_carro, input_casa, input_telefone_trabalho, input_telefon
               input_email, input_idade, input_anos_empregado, input_tamanho_familia,
               input_rendimento_anual, input_categoria_renda, input_escolaridade,
               input_estado_civil, input_moradia, input_ocupacao, 0]
+
+new_client_df = pd.DataFrame(new_client, columns=dados.columns)
+
+df_train, df_test = data_split(dados, 0.25)
+
+concat_cliente_test_df = pd.concat([df_test, new_client_df], axis=0)
+
+

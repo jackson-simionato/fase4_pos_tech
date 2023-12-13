@@ -1,6 +1,7 @@
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import MinMaxScaler, OneHotEncoder, OrdinalEncoder
 from imblearn.over_sampling import SMOTE
+from sklearn.model_selection import train_test_split
 
 class DropFeatures(BaseEstimator, TransformerMixin):
     def __init__(self, feature_to_drop='ID_Cliente') -> None:
@@ -98,3 +99,12 @@ class OverSample(BaseEstimator, TransformerMixin):
         df_bal = pd.concat([pd.DataFrame(x_bal), pd.DataFrame(y_bal)], axis=1)
 
         return df_bal
+    
+
+    def data_split(df, test_size):
+        SEED = 1561651
+        df_train, df_test = train_test_split(df, test_size, random_state=SEED)
+        df_train.reset_index(drop=True, inplace=True)
+        df_test.reset_index(drop=True, inplace=True)
+
+        return df_train, df_test
