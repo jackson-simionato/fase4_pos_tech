@@ -9,9 +9,9 @@ from joblib import load
 def pipeline_ml(df):
     pipeline = Pipeline([
         ('feature_dropper', DropFeatures()),
+        ('scaler', MinMax()),
         ('one_hot_encoder', OneHotEncoding()),
-        ('ordinal_encoder', OrdinalFeature()),
-        ('scaler', MinMax())
+        ('ordinal_encoder', OrdinalFeature())
     ])
 
     df_pipeline = pipeline.fit_transform(df)
@@ -101,10 +101,27 @@ new_client = [0, input_carro, input_casa, input_telefone_trabalho, input_telefon
               input_rendimento_anual, input_categoria_renda, input_escolaridade,
               input_estado_civil, input_moradia, input_ocupacao, 0]
 
-new_client_df = pd.DataFrame(new_client, columns=dados.columns)
+new_client_df = pd.DataFrame(data=[new_client], columns=dados.columns)
 
 df_train, df_test = data_split(dados, 0.25)
 
 concat_cliente_test_df = pd.concat([df_test, new_client_df], axis=0)
+
+concat_processed = pipeline_ml(concat_cliente_test_df)
+
+cliente_pred = concat_processed.drop(columns=['Risco_de_credito'])
+
+st.write(cliente_pred.iloc[-1,:])
+
+if st.button('Enviar'):
+    model = joblib.load('./modelo/rf_model_credit_score.joblib')
+
+    y_pred = model.predict(cliente_pred)
+
+    if y_pred[-1] == 0:
+        st.success('### Parabéns! Crédito aprovado!')
+        st.balloons()
+    else:
+        st.error('### Que pena! Crédito não aprovado :(')
 
 
