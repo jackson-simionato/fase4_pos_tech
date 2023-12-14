@@ -114,7 +114,7 @@ cliente_pred = concat_processed.drop(columns=['Risco_de_credito'])
 st.write(cliente_pred.iloc[-1,:])
 
 if st.button('Enviar'):
-    model = joblib.load('./modelo/rf_model_credit_score.joblib')
+    model = joblib.load('./modelo/logistic_model_credit_score.joblib')
 
     y_pred = model.predict(cliente_pred)
 
